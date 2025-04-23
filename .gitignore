@@ -1,0 +1,23 @@
+# Ignorar carpetas de cache
+__pycache__/
+*.py[cod]
+
+# Entornos virtuales
+env/
+venv/
+ENV/
+.venv/
+
+# Archivos de configuración personal
+.vscode/
+.idea/
+
+# Archivos de entorno (variables sensibles)
+.env
+
+# Archivos de log o bases de datos temporales
+*.log
+*.sqlite3
+
+# Compilados (en caso de usar Cython u otros)
+*.so
