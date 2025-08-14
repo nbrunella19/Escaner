@@ -6,7 +6,7 @@ import struct
 import matplotlib.pyplot as plt
 
 class HP3458A:
-    def __init__(self, gpib_address: str = "GPIB0::22::INSTR", do_reset=True, verbose=True):
+    def __init__(self, gpib_address: str = "GPIB0::26::INSTR", do_reset=True, verbose=True):
         self.gpib_address = gpib_address
         self.verbose = verbose
         self.rm = pyvisa.ResourceManager()
