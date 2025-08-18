@@ -71,7 +71,7 @@ frame_ejecucion = ttk.Frame(notebook)
 
 # Agregar las pestañas al Notebook
 notebook.add(frame_configuracion, text="Configuración")
-notebook.add(frame_dispositivos, text="Dispositivos")
+notebook.add(frame_dispositivos, text="Instrmentos")
 notebook.add(frame_ejecucion, text="Ejecución")
 
 
@@ -132,11 +132,12 @@ for i in range(5):
     chk = tk.Checkbutton(frame_x, variable=checks_x[i])
     chk.pack(side=tk.LEFT, padx=2)
 
-# ========== Pestaña "Dispositivos" ==========
+# ========== Pestaña "Instrumentos" ==========
 label_dispositivo1 = tk.Label(frame_dispositivos, text="Medición de Temperatura de Rs:", font=("Arial", 12))
 label_dispositivo1.pack(pady=5, anchor="w")
 
 opciones_dispositivos = ["HP3458A", "HP34401", "HP34420"]
+opciones_GPIB = ["GPIB0::13::INSTR", "GPIB0::14::INSTR","GPIB0::15::INSTR", "GPIB0::18::INSTR", "GPIB0::26::INSTR"]
 
 combobox_dispositivo1 = ttk.Combobox(frame_dispositivos, values=opciones_dispositivos, state="readonly")
 combobox_dispositivo1.pack(pady=5, anchor="w")

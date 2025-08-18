@@ -11,10 +11,24 @@ bridge.local_unlock()
 print("Estado:", bridge.query())
 bridge.close()
 """
+"""
 Mul_HP3458A = HP3458A("GPIB0::26::INSTR")
 valor=Mul_HP3458A.identify()
 print("Identificación del HP3458A:", valor) 
 Mul_HP3458A.close()
+"""
+"""
+# Pruebas del multímetro HP34401A
+Mul_HP34401A = HP34401A("GPIB0::14::INSTR")
+valor=Mul_HP34401A.identify()
+print("Identificación del HP34401:", valor) 
+Mul_HP34401A.close()
+"""
+# Pruebas del multímetro HP34401A
+Mul_HP34420A = HP34420A("GPIB0::14::INSTR")
+valor=Mul_HP34420A.identify()
+print("Identificación del HP34420:", valor) 
+Mul_HP34420A.close()
 
 """
 # Pruebas en el scanner
