@@ -1,8 +1,5 @@
 from Instrumental.MI6010D import MI60100
-from Instrumental.Scanner import ScannerInti
-from Instrumental.HP3458A import HP3458A
-from Instrumental.HP34401 import HP34401A
-from Instrumental.HP34420 import HP34420A
+
 import re
 import csv
 import os
