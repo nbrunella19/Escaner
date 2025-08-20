@@ -11,7 +11,6 @@ class MI60100Error(Exception):
         self.code = code
         self.message = message
 
-
 class MI60100:
     """
     Wrapper simple para controlar el MI-60100 por GPIB usando pyvisa.
@@ -51,11 +50,9 @@ class MI60100:
         self.instr.timeout = int(timeout_ms)  # ms
         # Termination: manual reports in manual appear to be ASCII text (use default)
         # A menudo los dispositivos GPIB usan '\n' terminador; si hace falta, ajustar.
-        try:
-            self.instr.read_termination = '\n'
-            self.instr.write_termination = '\n'
-        except Exception:
-            pass
+        self.instr.read_termination = '\n'
+        self.instr.write_termination = '\n'
+        #print(f"DEBUG: Write termination set to: '{self.instr.write_termination}'") # ¡Añade esta línea!
 
     # ---------------------
     # Low level helpers
@@ -94,8 +91,8 @@ class MI60100:
 
     def local_unlock(self):
         """u - Enables 'remote' (quita local lockout)."""
-        self._write('u')
-
+        self._write('u')   
+    
     def standby(self):
         """s - Pone STANDBY ON para detener medición/calibración."""
         self._write('s')
@@ -203,7 +200,13 @@ class MI60100:
         if read_response:
             return self._read()
         return None
-
+    
+    def single_measurement(self):
+        """
+        Realiza una única medición y devuelve el reporte crudo.
+        Usa M1R para evitar problemas de sincronización.
+        """
+        return self._query("M1R")
     # ---------------------
     # Lectura de reportes (SRQ / Reports)
     # ---------------------
@@ -214,7 +217,78 @@ class MI60100:
         puede ser necesario hacer serial poll/handle SRQ en el controlador.
         """
         return self._read()
+    
+    # ---------------------
+    # Método de reinicio
+    # ---------------------
+    def reset_bridge(self):
+        """
+        Intenta restablecer el puente MI-60100 a un estado conocido y limpio.
+        Esto incluye:
+        1. Poner el puente en modo STANDBY.
+        2. Apagar la corriente primaria Ix.
+        3. Intentar limpiar cualquier mensaje de error o reporte pendiente del búfer del instrumento.
+        4. Verificar el estado para confirmar un reset parcial.
+        """
+        print("Intentando restablecer el puente MI-60100 a un estado conocido...")
+        try:
+            # 1. Poner en STANDBY [7, A1]
+            print("Enviando comando 'standby'...")
+            self.standby()
+            # Una pequeña pausa puede ser útil para que el instrumento procese el comando [conversación anterior]
+            time.sleep(0.1) 
 
+            # 2. Intentar limpiar cualquier mensaje de error o reporte pendiente
+            # Se usa un timeout más corto para esta operación de limpieza.
+            print("Intentando limpiar el búfer de comunicación de cualquier mensaje pendiente...")
+            original_timeout = self.instr.timeout
+            # Establecer un timeout más corto (ej. 1 segundo = 1000 ms) para la limpieza
+            self.instr.timeout = 1000 
+
+            messages_cleared = []
+            while True:
+                try:
+                    # Intentar leer cualquier cosa que el instrumento pueda haber enviado.
+                    # El método _read() ya maneja los errores Ecnn elevando MI60100Error [3].
+                    cleared_message = self._read()
+                    messages_cleared.append(cleared_message)
+                    print(f"Mensaje/Reporte leído durante la limpieza: '{cleared_message}'")
+                except MI60100Error as e_mi:
+                    # Si el instrumento reporta un error, lo registramos y continuamos intentando limpiar.
+                    messages_cleared.append(f"Error MI60100: {e_mi.message} (Código: {e_mi.code})")
+                    print(f"Error del instrumento durante la limpieza: {e_mi.message} (Código: {e_mi.code})")
+                except pyvisa.errors.VisaIOError as e_visa:
+                    # Esto es lo esperado cuando el búfer de lectura del instrumento está vacío y se produce un timeout.
+                    print(f"Timeout de lectura durante la limpieza, búfer probablemente vacío: {e_visa}")
+                    break # Salir del bucle de limpieza, ya no hay más mensajes.
+                except Exception as e_generic:
+                    # Capturar cualquier otro error inesperado que pudiera ocurrir durante la lectura.
+                    print(f"Error inesperado durante la limpieza del búfer: {e_generic}")
+                    break # Salir para evitar un bucle infinito en caso de un error irrecuperable.
+            
+            # Restaurar el timeout original del instrumento
+            self.instr.timeout = original_timeout 
+
+            if messages_cleared:
+                print(f"Se limpiaron los siguientes mensajes/errores del búfer: {messages_cleared}")
+            else:
+                print("No se encontraron mensajes pendientes en el búfer de comunicación.")
+
+            # 3. Verificar el estado final [A1, 7]
+            # Después de la limpieza, se intenta una consulta de estado para confirmar la comunicación.
+            final_status = self.query()
+            print(f"Puente MI-60100 restablecido a estado: '{final_status}'")
+            return True # Retorna True si el proceso de restablecimiento parece exitoso
+
+        except MI60100Error as e:
+            # Capturar errores del propio instrumento que impiden un reinicio.
+            print(f"ERROR: Fallo al restablecer el puente MI-60100 debido a un error persistente del instrumento: {e.message} (Código: {e.code})")
+            # Es importante relanzar el error para que el código que llamó a este método sepa que falló.
+            raise 
+        except Exception as e:
+            # Capturar cualquier otro tipo de error inesperado (ej. problemas de conexión PyVISA).
+            print(f"ERROR: Ocurrió un error inesperado al intentar restablecer el puente: {e}")
+            raise 
     # ---------------------
     # Cierre
     # ---------------------
