@@ -52,17 +52,24 @@ class MI60100:
         # A menudo los dispositivos GPIB usan '\n' terminador; si hace falta, ajustar.
         self.instr.read_termination = '\r\n'
         self.instr.write_termination = '\r\n'
+        #self.instr.read_termination = '\n'
+        #self.instr.write_termination = '\n'
         #print(f"DEBUG: Write termination set to: '{self.instr.write_termination}'") # ¡Añade esta línea!
 
     # ---------------------
     # Low level helpers
     # ---------------------
+
     def _write(self, cmd: str):
         if not cmd.endswith("\r\n"):
             cmd = cmd + "\r\n"
         print(f"[DEBUG] Enviando: {repr(cmd)}")
         self.instr.write_raw(cmd.encode())  # fuerza bytes con CRLF
-
+    """
+    def _write(self, cmd: str):
+        print(f"[DEBUG] Enviando: {repr(cmd)}")
+        self.instr.write(cmd)
+    """
     def _read(self, timeout_s=None):
         resp = self.instr.read().strip()
         # Si no termina con terminador esperado, añadirlo virtualmente

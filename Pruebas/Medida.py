@@ -1,6 +1,5 @@
 import numpy as np
 import time
-
 import os
 import sys
 # Hay que poner esto para que me tome el modulo MI6010D

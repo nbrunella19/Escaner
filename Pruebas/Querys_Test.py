@@ -12,7 +12,7 @@ from Instrumental.HP34420 import HP34420A
 bridge = MI60100(15)  # GPIB #15
 bridge.local_unlock()
 bridge.standby()
-print("Estado:", bridge.query())
+print("Estado:", bridge._query('Q'))
 bridge.local_lockout()
 bridge.close()
 
