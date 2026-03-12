@@ -20,8 +20,19 @@ class HP34401A:
         self.instrument.write(f"VOLT:DC:RES {resolution}")
 
     def read(self):
-        return float(self.instrument.query("READ?"))
+        return abs(float(self.instrument.query("READ?")))
 
     def close(self):
         self.instrument.close()
         self.rm.close()
+        
+    def configure_resistance_4wire(self, range_val=1000, resolution=0.001):
+        """
+        Configura medición de resistencia 4 terminales
+        """
+        self.instrument.write("CONF:FRES")
+        self.instrument.write(f"FRES:RANG {range_val}")
+        self.instrument.write(f"FRES:RES {resolution}")
+        
+        # tiempo de integración (mejor precisión)
+        self.instrument.write("SENS:FRES:NPLC 10")

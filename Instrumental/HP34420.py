@@ -20,8 +20,37 @@ class HP34420A:
         self.instrument.write(f"VOLT:DC:RES {resolution}")
 
     def read(self):
-        return float(self.instrument.query("READ?"))
+        if hasattr(self, "_measure_cmd"):
+            return float(self.instrument.query(self._measure_cmd))
+        else:
+            return float(self.instrument.query("READ?"))
 
     def close(self):
         self.instrument.close()
         self.rm.close()
+    
+    def configure_resistance_4wire(self, range_val=1000, resolution=0.001):
+
+        # seleccionar terminal frontal correcto
+        self.instrument.write("ROUT:TERM FRONt2")
+
+        # modo 4-wire
+        self.instrument.write("CONF:FRES")
+
+        # rango
+        self.instrument.write(f"FRES:RANG {range_val}")
+
+        # resolución
+        self.instrument.write(f"FRES:RES {resolution}")
+
+        # tiempo de integración
+        self.instrument.write("SENS:FRES:NPLC 10")
+    
+
+        
+    def configure_resistance_4wire_2(self, range_val=1000, resolution=0.001):
+        # seleccionar terminal correcto
+        self.instrument.write("ROUT:TERM FRONt1")
+
+        # guardar comando de medición directa
+        self._measure_cmd = f"MEAS:FRES? {range_val},{resolution}"
