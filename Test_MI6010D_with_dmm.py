@@ -43,7 +43,7 @@ def test_mi6010d_with_dmm():
     r2_values = []
 
     # intervalo de lectura de DMM
-    DMM_INTERVAL = 1.0
+    DMM_INTERVAL = 5.0
     next_dmm_time = time.time()
     
     bridge.is_present = True
@@ -55,7 +55,6 @@ def test_mi6010d_with_dmm():
         bridge.reset()
         bridge.send_remote()
         bridge.send_stop()
-
         bridge.send_rs(RS)
         bridge.send_rx(RX)
         bridge.send_ix(IX)
@@ -67,7 +66,7 @@ def test_mi6010d_with_dmm():
 
         timeout_limit = time.time() + 600
 
-        while len(measurements) < 5:
+        while len(measurements) < NUM_MEASUREMENTS:
 
             if time.time() > timeout_limit:
                 print("⛔ Timeout global alcanzado")
