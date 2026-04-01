@@ -1,4 +1,5 @@
 ################################################## LIBRERIAS #########################################################
+import csv
 import os
 import sys 
 import json
@@ -12,13 +13,43 @@ from pathlib import Path
 from datetime import datetime
 
 #####################################################################################################################
+def Welcome_Menu():
+    limpiar_pantalla()
+    limpiar_teclado()
+    print("###################################################################################################")
+    print("#   Sistema de medición y calibración de resistores de precisión ScannerINTI-MI6010D v1.0 ")    
+    print("#   Autor: NSB")   
+    print("#   Año  : 2026")      
+    print("###################################################################################################")
+    while True:
+        opcion = input("\nPresionar 1 para iniciar medición o 2 para cerrar: ")
+        limpiar_pantalla() 
+        if opcion == "1":
+            Estado = "Config_Escaner"
+            break
+        if opcion == "2":
+            sys.exit()  
+        else:
+            limpiar_pantalla()
+            print("Elección incorrecta.") 
+    return Estado
+##################################################################################################################### 
 
-def Mostrar_Menu():
-    print("--- Menú Principal ---")
-    opcion = input("Presione Enter para empezar")
-    return opcion
-
-#####################################################################################################################   
+def Final_Menu():
+    limpiar_teclado()
+    while True:
+        opcion = input("\nPresionar 1 para volver al menú principal o 2 para cerrar: ")  
+        limpiar_pantalla() 
+        if opcion == "1":
+            Estado = "Inicio"
+            break
+        if opcion == "2":
+            sys.exit()  
+        else:
+            limpiar_pantalla()
+            print("Elección incorrecta.") 
+    return Estado
+#####################################################################################################################     
 
 def limpiar_pantalla():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -201,13 +232,16 @@ def Menu_Config():
     return Vn_capacitor_int, Vn_resistencia_int, tau_x_ciclo
 
 
-def Mostrar_Configuracion(Modo, Vn_Cx, Vn_Rp, Vn_Tau, Frec):
+def Mostrar_Configuracion(Rx, Rs, Ix, Is, T_inv, Cant_Med, Cant_Stat):
     
+    Is= Ix * Rs / Rx  # Corriente en Rs usando divisor de corriente
     print("\n--- Resumen de configuración ---\n") 
-    print(f"Se utilizará el set de medición: {Modo}")
-    print(f"Capacitor incognita de valor nominal : {Vn_Cx} uF")
-    print(f"Resistor patrón de: {Vn_Rp} ohm")
-    print(f"El tau esperado es de: {Vn_Tau} segundos")
+    print(f"Se medirá un RX de valor nominal: {Rx} ohm")
+    print(f"Se utilizará un Rs de valor nominal: {Rs} ohm")
+    print(f"La corriente aplicada en Rx será: {Ix} ohm")
+    print(f"La corriente aplicada en Rs será: {Is} ohm")
+    print(f"El tiempo de inversión será: {T_inv} segundos")
+    print(f"Se realizarán {Cant_Med} mediciones, con {Cant_Stat} estadísticas cada una")
     print("\n--- ------------------------- ---\n") 
     print(f"Se aplicará una señal cuadrada de valor tensión pico 1 V, montada sobre una contínua de 0.5 V y frecuencia de: {Frec} Hz \n")
   
@@ -243,36 +277,62 @@ def Menu_Final():
                 limpiar_pantalla()
                 print("Elección incorrecta.")
 
-######################################################################################################################
 
-def Guardar_Medicion(Ruta_Guardado,Medicion_Realizada):
-    """
-    Guardar los datos de la medición en un archivo de texto
-    """
-    with open(Ruta_Guardado, "w") as file:         
-            for dato in Medicion_Realizada:
-                file.write(f"{dato}\n")  
 
-###################################################################################################################
-
-def Guardar_Medicion_Config(Ruta_Config, Modo,Vn_Cx, Vn_Rp, Vn_Tau, Frec, Sweep_time):
+def Save_Data(Name_M,Path_Output, Rs, Rx, Ix, T_Invertion, Num_Med, Num_Stat,
+              Mea_Res=None, Mea_Temp1=None, Mea_Temp2=None):
     """
-    Guardar los datos de la medición en un archivo de texto
-    """  
-    # Si se pasaron los parámetros, guardarlos en un archivo JSON
-    if None not in (Modo,Vn_Cx, Vn_Rp, Vn_Tau, Frec, Sweep_time):
+    Guardar los datos de la medición en un archivo CSV
+    """
+
+    if None not in (Path_Output, Rs, Rx, Ix, T_Invertion, Num_Med):
+
         parametros = {
-            "Modo": Modo, 
-            "Vn_Cx": Vn_Cx,
-            "Vn_Rp": Vn_Rp,
-            "Vn_Tau": Vn_Tau,
-            "Frec": Frec,
-            "Sweep_time": Sweep_time
+            "Resistor Patrón ('Rs')" : Rs,
+            "Resistor Medido ('Rx')" : Rx,
+            "Corriente aplicada a Rx": Ix,
+            "Tiempo de inversión"    : T_Invertion,
+            "Número de mediciones"   : Num_Med,
+            "Número de estadísticas" : Num_Stat
         }
-        
-        ruta_json = Path(Ruta_Config).with_suffix(".json")
-        with open(ruta_json, "w") as json_file:
-            json.dump(parametros, json_file, indent=4)
+
+        ruta_csv = Path(Path_Output).with_suffix(".csv")
+
+        with open(ruta_csv, "w", newline="") as csv_file:
+
+            # ---- Guardar parámetros ----
+            writer = csv.DictWriter(csv_file, fieldnames=parametros.keys())
+            writer.writeheader()
+            writer.writerow(parametros)
+
+            # Línea vacía para separar
+            csv_file.write("\n")
+
+            # ---- Preparar columnas de medición ----
+            columnas = {}
+            if Mea_Res not in (None, 0, []):
+                columnas["Resistencia"] = Mea_Res
+
+            if Mea_Temp1 not in (None, 0, []):
+                columnas["Temp1"] = Mea_Temp1
+
+            if Mea_Temp2 not in (None, 0, []):
+                columnas["Temp2"] = Mea_Temp2
+
+            # Si hay datos de medición
+            if columnas:
+                fieldnames = list(columnas.keys())
+                writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+                writer.writeheader()
+
+                # número máximo de filas
+                n = max(len(v) for v in columnas.values())
+
+                for i in range(n):
+                    fila = {}
+                    for k, v in columnas.items():
+                        fila[k] = v[i] if i < len(v) else ""
+                    writer.writerow(fila)
 
 ###################################################################################################################
 def Set_Directories(cliente, nombre_resistor):
@@ -327,3 +387,51 @@ def Set_Directories(cliente, nombre_resistor):
     except Exception as e:
         print("Error al crear las carpetas:", e)
         return None
+
+
+def Config_Rx():
+    while True:
+
+        Client_input = input("Ingrese el nombre de cliente: ")
+        if Client_input.isdigit():
+            Client_Rx = int(Client_input)
+            print(f"El cliente es: {Client_Rx}")           
+        else:
+            print("Valor no válido. Por favor, ingrese un número entero.")
+
+        Rx_nom_input = input("Ingrese el valor nominal de Rx en ohm: ")
+        if Rx_nom_input.isdigit():
+            Rx_nom = int(Rx_nom_input)
+            print(f"El valor nominal de Rx es: {Rx_nom}")           
+        else:
+            print("Valor no válido. Por favor, ingrese un número entero.")
+
+        Name_input = input("Ingrese el valor nominal de Rx en ohm: ")
+        if Name_input.isdigit():
+            Name_Rx = int(Name_input)
+            print(f"La fecha es: {Name_Rx}")           
+        else:
+            print("Valor no válido. Por favor, ingrese un número entero.")
+
+        Name_input = input("Ingrese el nombre del resistor: ")
+        if Name_input.isdigit():
+            Name_Rx = int(Name_input)
+            print(f"El nombre del resistor es: {Name_Rx}")           
+        else:
+            print("Valor no válido. Por favor, ingrese un número entero.")
+
+        Rx_input = input("Ingrese el valor nominal de Rx en ohm: ")
+        if Rx_input.isdigit():
+            Rx = int(Rx_input)
+            print(f"Rx configurado a {Rx} ohm")           
+        else:
+            print("Valor no válido. Por favor, ingrese un número entero.")
+
+        Ix_input = input("Ingrese el valor nominal de Ix en A: ")
+        if Ix_input.isdigit():
+            Ix = int(Ix_input)
+            print(f"Ix configurado a {Ix} A")           
+        else:
+            print("Valor no válido. Por favor, ingrese un número entero.")
+            
+        return Rx

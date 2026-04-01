@@ -1,3 +1,8 @@
+#################################################################################################################
+#   Archivo: Scanner.py 
+#   Descripción: Clase para controlar el conmutador de entradas/salidas del escáner, utilizando PyVISA para la comunicación GPIB
+#   Autor: NSB
+#################################################################################################################
 import time
 import pyvisa
 
@@ -6,26 +11,39 @@ class ScannerInti:
     ADDRESS_GPIB = "GPIB0::18::INSTR"  # Formato VISA
     SALIDA_1 = 'S'
     SALIDA_2 = 'X'
+    ENTRADA_1 = 1
+    ENTRADA_2 = 2
+    ENTRADA_3 = 3
+    ENTRADA_4 = 4
+    ENTRADA_5 = 5
+    ENTRADA_6 = 6
+    ENTRADA_7 = 7
+    ENTRADA_8 = 8
+    ENTRADA_9 = 9
+    ENTRADA_10 = 10
     NADA = 63
     RESET_TODO = 112
-
-    DireccionGPIB = None  # Será el recurso VISA
 
     def __init__(self):
         # Inicializa conexión con PyVISA
         self.rm = pyvisa.ResourceManager()
         try:
-            ScannerInti.DireccionGPIB = self.rm.open_resource(self.ADDRESS_GPIB)
-            ScannerInti.DireccionGPIB.timeout = 1000  # Timeout en ms
+            self.direccion = self.rm.open_resource(self.ADDRESS_GPIB)
+            self.direccion.timeout = 1000  # Timeout en ms
             print(f"Conectado a {self.ADDRESS_GPIB}")
-            self.Configuracion(ScannerInti.DireccionGPIB)
+            self.Configuracion(self.direccion)
         except Exception as e:
             raise RuntimeError(f"No se pudo conectar al instrumento: {e}")
 
+    def close(self):
+        """Cierra explícitamente la conexión del Scanner."""
+        if hasattr(self, 'direccion') and self.direccion is not None:
+            self.direccion.close()
+            self.direccion = None
+            print("Conexión Scanner cerrada")
+
     def __del__(self):
-        if ScannerInti.DireccionGPIB is not None:
-            ScannerInti.DireccionGPIB.close()
-            print("Conexión cerrada")
+        self.close()
 
     # ---------------------------------------------------
     # Métodos privados para comunicación GPIB
@@ -125,3 +143,11 @@ class ScannerInti:
             datoaescribir += 64
             self.EnviarDato(direccion, datoaescribir)
         return 0
+    
+    # Nuevo método para hacer un query al instrumento
+    def query(self, command):
+        """
+        Envía un comando al instrumento y devuelve la respuesta.
+        """
+        self._iprintf(self.direccion, command)
+        print(self._iscanf(self.direccion))

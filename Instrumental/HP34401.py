@@ -23,8 +23,11 @@ class HP34401A:
         return abs(float(self.instrument.query("READ?")))
 
     def close(self):
-        self.instrument.close()
-        self.rm.close()
+        """Close the instrument connection (keep ResourceManager open)."""
+        if self.instrument:
+            self.instrument.close()
+            self.instrument = None
+        # Keep rm open to avoid invalidating other GPIB instruments
         
     def configure_resistance_4wire(self, range_val=1000, resolution=0.001):
         """

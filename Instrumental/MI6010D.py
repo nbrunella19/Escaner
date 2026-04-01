@@ -158,15 +158,15 @@ class MI6010D:
             self._gpib_error = 1
     
     def disconnect(self):
-        """Close GPIB connection to the instrument."""
+        """Close GPIB connection to the instrument (keep ResourceManager open)."""
         if not self._is_present:
             return
         
         try:
             if self._instrument:
                 self._instrument.close()
-            if self._resource_manager:
-                self._resource_manager.close()
+                self._instrument = None
+            # Keep _resource_manager open to avoid invalidating other GPIB instruments
         except Exception as e:
             print(f"Error disconnecting from GPIB device: {e}")
             self._gpib_error = 1
