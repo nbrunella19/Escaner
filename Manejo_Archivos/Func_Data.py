@@ -12,20 +12,21 @@ from scipy.stats import linregress
 from pathlib import Path
 from datetime import datetime
 
+
 #####################################################################################################################
 def Welcome_Menu():
     limpiar_pantalla()
     limpiar_teclado()
-    print("###################################################################################################")
+    print("=" * 60)
     print("#   Sistema de medición y calibración de resistores de precisión ScannerINTI-MI6010D v1.0 ")    
     print("#   Autor: NSB")   
     print("#   Año  : 2026")      
-    print("###################################################################################################")
+    print("=" * 60)
     while True:
         opcion = input("\nPresionar 1 para iniciar medición o 2 para cerrar: ")
         limpiar_pantalla() 
         if opcion == "1":
-            Estado = "Config_Escaner"
+            Estado = "Lectura_Parametros"
             break
         if opcion == "2":
             sys.exit()  
@@ -180,32 +181,6 @@ def Creacion_Directorio_Salida(RS, RX, IX, TIME_REVERSAL, NUM_MEASUREMENTS, NUM_
     print(f"Archivo de medición guardado en: {Ruta_medicion_resistencia}")
     print(f"Archivo de configuración guardado en: {Ruta_medicion_temperatura}")
 
-
-#####################################################################################################################
-def Menu_Instrumental():
-    
-    while True:
-        print("Seleccionar Set de medición \n")
-        print("1. INTI")
-        print("2. FRH")
-        limpiar_teclado()
-        opcion_generador = input("Introducir Set (1 o 2):")
-        
-        
-        if opcion_generador == "1":
-            opcion = "Set INTI"
-            break
-        elif opcion_generador == "2":
-            opcion = "Set FRH"
-            break  
-        
-        else:
-            print("Seleccionar Set de medición")
-            print("1. INTI")
-            print("2. FRH")
-        
-    return opcion   
-
 #####################################################################################################################
 def Menu_Config():   
     
@@ -242,23 +217,8 @@ def Mostrar_Configuracion(Rx, Rs, Ix, Is, T_inv, Cant_Med, Cant_Stat):
     print(f"La corriente aplicada en Rs será: {Is} ohm")
     print(f"El tiempo de inversión será: {T_inv} segundos")
     print(f"Se realizarán {Cant_Med} mediciones, con {Cant_Stat} estadísticas cada una")
-    print("\n--- ------------------------- ---\n") 
-    print(f"Se aplicará una señal cuadrada de valor tensión pico 1 V, montada sobre una contínua de 0.5 V y frecuencia de: {Frec} Hz \n")
-  
-    while True:
-        entrada = input("Para continuar presione 1. Para volver a iniciar presione r")
-        
-        if   entrada  == "1":
-                opcion = "INICIALIZACION"
-                break                  
-        elif entrada  == "r":
-                opcion  = "CONFIGURACION"
-                break
-        else:
-            limpiar_pantalla()
-            print("Ingreso incorrecto")
-    
-    return opcion
+   
+    return 
 
 ###################################################################################################################
 
@@ -435,3 +395,74 @@ def Config_Rx():
             print("Valor no válido. Por favor, ingrese un número entero.")
             
         return Rx
+
+def Lectura_Parametros():    
+    
+    print("\n---- Lectura de parámetros ----\n")  
+    while True:
+                
+            Ruta_entrada = input("Ingrese la ruta completa del archivo de parámetros (CSV): ")
+            Ruta = Path(Ruta_entrada)
+    
+            if not Ruta.exists():
+        
+                opcion = input("Ruta mal escrita o archivo no encontrado.\nPresionar 2 para salir o cualquier otra tecla para intentar de nuevo: ")
+                if opcion == "2":
+                    sys.exit()  
+            else:
+                break
+    
+    with open(Ruta, "r") as file:    
+        # Leer el archivo CSV y almacenar los datos en una lista de listas
+        datos = csv.reader(file)
+        
+        listado_listas = []
+        # Convertir cada fila del CSV en una lista y agregarla a la lista principal
+        for fila in datos:
+            listado_listas.append(fila)
+        
+        # Crear DataFrame
+        columnas = ['ID_Rs', 'ID_Rx', 'Ix [mA]', 'Tiempo_Inversion [s]', 'VN_Rs [ohm]', 'Cant_Mediciones', 'Cant_Estadistica', 'Ch_Rs', 'Ch_Rx', 'Bit_Control']        
+        # Ordenamiento de información en DataFrame para facilitar su procesamiento.
+        df = pd.DataFrame(listado_listas, columns=columnas)
+        
+        # Variable global para cantidad de Mediciones
+        Cantidad_filas = len(df)
+
+
+    return "Medición",df,Cantidad_filas
+
+
+def Cargar_Resistor_Calibrado(RS_NOMBRE):
+    """
+    Busca un resistor en el archivo Base 16-03-26.json por nombre
+    Si lo encuentra, devuelve un diccionario con sus propiedades
+    Si no lo encuentra, devuelve None
+    """
+    ruta_base = Path(__file__).parent.parent
+    ruta_json = ruta_base / "Base 16-03-26.json"
+    
+    if not ruta_json.exists():
+        print(f"Archivo no encontrado: {ruta_json}")
+        return None
+    
+    try:
+        with open(ruta_json, "r") as file:
+            datos = json.load(file)
+        
+        # Buscar el resistor por nombre
+        for resistor in datos:
+            if resistor.get("Nombre") == RS_NOMBRE:
+                print(f"\n✓ Resistor '{RS_NOMBRE}' encontrado en base de datos")
+                return resistor
+        
+        print(f"\n✗ Resistor '{RS_NOMBRE}' NO encontrado en base de datos")
+        return None
+        
+    except json.JSONDecodeError as e:
+        print(f"Error al leer el archivo JSON: {e}")
+        return None
+    except Exception as e:
+        print(f"Error: {e}")
+        return None
+

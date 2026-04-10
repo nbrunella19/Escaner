@@ -8,7 +8,7 @@ import pyvisa
 
 class ScannerInti:
     # Constantes del instrumento
-    ADDRESS_GPIB = "GPIB0::18::INSTR"  # Formato VISA
+    #ADDRESS_GPIB = "GPIB0::18::INSTR"  # Formato VISA
     SALIDA_1 = 'S'
     SALIDA_2 = 'X'
     ENTRADA_1 = 1
@@ -24,13 +24,13 @@ class ScannerInti:
     NADA = 63
     RESET_TODO = 112
 
-    def __init__(self):
+    def __init__(self, gpib_address: str = "GPIB0::18::INSTR"):
         # Inicializa conexión con PyVISA
         self.rm = pyvisa.ResourceManager()
         try:
-            self.direccion = self.rm.open_resource(self.ADDRESS_GPIB)
+            self.direccion = self.rm.open_resource(gpib_address)
             self.direccion.timeout = 1000  # Timeout en ms
-            print(f"Conectado a {self.ADDRESS_GPIB}")
+            print(f"Escaner conectado a {gpib_address}")
             self.Configuracion(self.direccion)
         except Exception as e:
             raise RuntimeError(f"No se pudo conectar al instrumento: {e}")

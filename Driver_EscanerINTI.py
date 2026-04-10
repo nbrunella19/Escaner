@@ -72,14 +72,16 @@ def Conectar_Entradas_Salidas(Scanner, ENTRADA_S, ENTRADA_X):
         return "Abrir_Canales"
 
     print(f"Conectando canal {ENTRADA_S} a salida S...")
+    # Salida S es "SALIDA_1"
     Scanner.SetearCanal(Scanner.direccion, Scanner.SALIDA_1, ENTRADA_S)
     time.sleep(1)
 
+    # Salida X es "SALIDA_2"
     print(f"Conectando canal {ENTRADA_X} a salida X...")
     Scanner.SetearCanal(Scanner.direccion, Scanner.SALIDA_2, ENTRADA_X)
     time.sleep(1)
 
-    return "Medición"
+    return "Análisis_Datos"
 
 
 def Abrir_Canales(Scanner):

@@ -16,30 +16,24 @@ from Instrumental.HP34401 import HP34401A
 
 
 
-def Measure_with_Temp(GPIB_ADDRESS, RS, RX, TIME_REVERSAL, IX, NUM_MEASUREMENTS, NUM_STATISTICS, IS, PSAMX):
+def Measure_with_Temp(GPIB_ADDRESS_BRID, RS, RX, TIME_REVERSAL, IX, NUM_MEASUREMENTS, NUM_STATISTICS, DMM_NAME_1, GPIB_ADDRESS_DMM1, DMM_NAME_2, GPIB_ADDRESS_DMM2):
 
     bridge = MI6010D()
-    """
-    # CONFIGURACIÓN
-    GPIB_ADDRESS = 15
-    RS = 1.0
-    RX = 1.0
-    TIME_REVERSAL = 8
-    IX = 1
-    NUM_MEASUREMENTS = 2
-    NUM_STATISTICS = 2
-    """
-    
+
+  
     dmm1 = None
     dmm2 = None
     bridge_connected = False
     dmm1_connected = False
     dmm2_connected = False
 
+    DMM_1 = f"{DMM_NAME_1}-{GPIB_ADDRESS_DMM1}"
+    DMM_2 = f"{DMM_NAME_2}-{GPIB_ADDRESS_DMM2}"
+
     # Intentar conectar puente
     try:
         bridge.is_present = True
-        bridge.gpib_address = GPIB_ADDRESS
+        bridge.gpib_address = GPIB_ADDRESS_BRID
         bridge.connect()
         bridge_connected = True
         print("Ejecutando test de MI6010D con DMMs...")
@@ -48,25 +42,32 @@ def Measure_with_Temp(GPIB_ADDRESS, RS, RX, TIME_REVERSAL, IX, NUM_MEASUREMENTS,
 
     # Intentar conectar DMM1
     try:
-        dmm1 = HP34401A("GPIB0::14::INSTR")
-        print("HP34401A:", dmm1.identify())
+        if DMM_NAME_1 == "HP34401A":
+            dmm1 = HP34401A(f"GPIB0::{GPIB_ADDRESS_DMM1}::INSTR")
+        elif DMM_NAME_1 == "HP34420A":
+            dmm1 = HP34420A(f"GPIB0::{GPIB_ADDRESS_DMM1}::INSTR")
+        print(f"DMM1 ({DMM_NAME_1}) conectado en GPIB {GPIB_ADDRESS_DMM1}")
         dmm1_connected = True
     except Exception as e:
-        print(f"No se pudo conectar al DMM1 HP34401A: {e}")
+        print(f"No se pudo conectar al DMM1 {DMM_NAME_1}: {e}")
 
     # Intentar conectar DMM2
     try:
-        dmm2 = HP34420A("GPIB0::13::INSTR")
-        print("HP34420A:", dmm2.identify())
+        if DMM_NAME_2 == "HP34401A":
+            dmm2 = HP34401A(f"GPIB0::{GPIB_ADDRESS_DMM2}::INSTR")
+        elif DMM_NAME_2 == "HP34420A":
+            dmm2 = HP34420A(f"GPIB0::{GPIB_ADDRESS_DMM2}::INSTR")
+        print(f"DMM2 ({DMM_NAME_2}) conectado en GPIB {GPIB_ADDRESS_DMM2}")
         dmm2_connected = True
     except Exception as e:
-        print(f"No se pudo conectar al DMM2 HP34420A: {e}")
+        print(f"No se pudo conectar al DMM2 {DMM_NAME_2}: {e}")
 
     # configuración DMM si conectados
     if dmm1_connected:
-        dmm1.configure_resistance_4wire(range_val=1000)
+        dmm1.configure_resistance_4wire(range_val=1000)  # HP34401A tiene rango máximo de 100Ω en 4-wire
     if dmm2_connected:
-        dmm2.configure_resistance_4wire_2(range_val=1000)
+        dmm2.configure_resistance_4wire(range_val=100)   # HP34420A tiene rango máximo de 100Ω en 4-wire
+
 
     # buffers de medición
     r1_values = []
@@ -84,7 +85,7 @@ def Measure_with_Temp(GPIB_ADDRESS, RS, RX, TIME_REVERSAL, IX, NUM_MEASUREMENTS,
             bridge.send_remote()
             bridge.send_stop()
             bridge.send_rs(RS)
-            bridge.send_rx(RX)
+            #bridge.send_rx(RX)
             bridge.send_ix(IX)
             bridge.send_reversal_rate(TIME_REVERSAL)
             bridge.send_measurements(NUM_MEASUREMENTS)
@@ -136,7 +137,7 @@ def Measure_with_Temp(GPIB_ADDRESS, RS, RX, TIME_REVERSAL, IX, NUM_MEASUREMENTS,
                     try:
                         r1 = dmm1.read()
                         r1_values.append(r1)
-                        print(f"DMM1: {r1:.6f} Ω")
+                        print(f"{DMM_1}: {r1:.5f} Ω")
                     except Exception as e:
                         print("Error leyendo DMM1:", e)
 
@@ -144,7 +145,7 @@ def Measure_with_Temp(GPIB_ADDRESS, RS, RX, TIME_REVERSAL, IX, NUM_MEASUREMENTS,
                     try:
                         r2 = dmm2.read()
                         r2_values.append(r2)
-                        print(f"DMM2: {r2:.6f} Ω")
+                        print(f"{DMM_2}: {r2:.5f} Ω")
                     except Exception as e:
                         print("Error leyendo DMM2:", e)
 
@@ -179,8 +180,8 @@ def Measure_with_Temp(GPIB_ADDRESS, RS, RX, TIME_REVERSAL, IX, NUM_MEASUREMENTS,
 def Check_de_Seguridad(Rs, Rx, Ismax, Ix,Psmax):
     Is= Rx*Ix*1e-3/Rs
     Ps= Rs*Is**2
-    print(f"Corriente de salida calculada: {Is:.4f} mA")
-    print(f"Potencia de salida calculada: {Ps:.4f} mW")
+    print(f"Corriente de salida calculada: {Is:.6f} mA")
+    print(f"Potencia de salida calculada: {Ps:.6f} mW")
     if Rs <= 0 or Rx <= 0:
         print("Error: Rs y Rx deben ser mayores que 0.")
         return False

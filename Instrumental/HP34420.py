@@ -18,6 +18,18 @@ class HP34420A:
         self.instrument.write("CONF:VOLT:DC")
         self.instrument.write(f"VOLT:DC:RANG {range_val}")
         self.instrument.write(f"VOLT:DC:RES {resolution}")
+        self.set_input_impedance(1e10)
+        self.set_digits(7)
+        self.set_integration_speed(10)
+
+    def set_input_impedance(self, impedance_ohm: float = 1e10):
+        self.instrument.write(f"SENS:VOLT:DC:IMP {impedance_ohm:.0E}")
+
+    def set_digits(self, digits: int = 7):
+        self.instrument.write(f"SENS:FRES:DIG {digits}")
+
+    def set_integration_speed(self, nplc: float = 20.0):
+        self.instrument.write(f"SENS:FRES:NPLC {nplc}")
 
     def read(self):
         if hasattr(self, "_measure_cmd"):
@@ -32,28 +44,15 @@ class HP34420A:
             self.instrument = None
         # Keep rm open to avoid invalidating other GPIB instruments
     
-    def configure_resistance_4wire(self, range_val=1000, resolution=0.001):
-
-        # seleccionar terminal frontal correcto
-        self.instrument.write("ROUT:TERM FRONt2")
-
-        # modo 4-wire
-        self.instrument.write("CONF:FRES")
-
-        # rango
-        self.instrument.write(f"FRES:RANG {range_val}")
-
-        # resolución
-        self.instrument.write(f"FRES:RES {resolution}")
-
-        # tiempo de integración
-        self.instrument.write("SENS:FRES:NPLC 10")
-    
-
-        
-    def configure_resistance_4wire_2(self, range_val=1000, resolution=0.001):
+    def configure_resistance_4wire(self, range_val=100, resolution=0.001,nplc=10):
         # seleccionar terminal correcto
         self.instrument.write("ROUT:TERM FRONt1")
-
-        # guardar comando de medición directa
-        self._measure_cmd = f"MEAS:FRES? {range_val},{resolution}"
+        # modo 4-wire
+        self.instrument.write("CONF:FRES")
+        # rango
+        self.instrument.write(f"FRES:RANG {range_val}")
+        # resolución
+        self.instrument.write(f"FRES:RES {resolution}")
+        # tiempo de integración
+        self.instrument.write(f"SENS:FRES:NPLC {nplc}")
+       

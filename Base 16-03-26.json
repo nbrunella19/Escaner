@@ -187,6 +187,28 @@
         "fecha de calibracion": "11/06/2025"
     },
     {
+        "Nombre": "RES_TEST1",
+        "serial": "3043",
+        "valor": 1,
+        "incertidumbre en ohm": "0.0",
+        "drift anual": 0.0,
+        "alfa": 0.0,
+        "beta": 0.0,
+        "temperatura de calibracion": 23.0,
+        "fecha de calibracion": "20/01/1810"
+    },
+    {
+        "Nombre": "RES_TEST2",
+        "serial": "8868",
+        "valor": 1,
+        "incertidumbre en ohm": 0.0,
+        "drift anual": 0.0,
+        "alfa": 0.0,
+        "beta": 0.0,
+        "temperatura de calibracion": 23.0,
+        "fecha de calibracion": "20/01/1810"
+    },
+    {
         "Nombre": "LPC-PT100-1",
         "serial": "Sin S/N",
         "valor": 99.85004,
