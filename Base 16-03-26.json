@@ -7,6 +7,7 @@
         "drift anual": 0.671,
         "alfa": -7e-08,
         "beta": -3.4e-08,
+        "Potencia máxima de disipación": 0.1,
         "temperatura de calibracion": 22.1,
         "fecha de calibracion": "11/06/2025"
     },
@@ -18,6 +19,7 @@
         "drift anual": 0.014,
         "alfa": 7.1e-06,
         "beta": -4.94e-07,
+        "Potencia máxima de disipación": 0.1,
         "temperatura de calibracion": 20.0,
         "fecha de calibracion": "30/12/2021"
     },
@@ -29,6 +31,7 @@
         "drift anual": -0.13,
         "alfa": 7.53e-06,
         "beta": 0.0,
+        "Potencia máxima de disipación": 0.1,
         "temperatura de calibracion": 20.0,
         "fecha de calibracion": "23/05/2025"
     },
@@ -40,6 +43,7 @@
         "drift anual": 0.038,
         "alfa": 7.625e-06,
         "beta": -5.35e-07,
+        "Potencia máxima de disipación": 0.1,
         "temperatura de calibracion": 20.03,
         "fecha de calibracion": "11/06/2025"
     },
@@ -51,6 +55,7 @@
         "drift anual": 0.025,
         "alfa": 1.033e-05,
         "beta": 0.0,
+        "Potencia máxima de disipación": 0.1,
         "temperatura de calibracion": 20.03,
         "fecha de calibracion": "23/05/2025"
     },
@@ -62,6 +67,7 @@
         "drift anual": 0.03,
         "alfa": 7.22e-06,
         "beta": 0.0,
+        "Potencia máxima de disipación": 0.1,
         "temperatura de calibracion": 20.02,
         "fecha de calibracion": "23/05/2025"
     },
@@ -73,6 +79,7 @@
         "drift anual": 0.013,
         "alfa": 7.82e-06,
         "beta": -5.13e-07,
+        "Potencia máxima de disipación": 0.1,
         "temperatura de calibracion": 20.02,
         "fecha de calibracion": "23/05/2025"
     },
@@ -84,6 +91,7 @@
         "drift anual": 0.693,
         "alfa": -1.1e-08,
         "beta": -1.8e-08,
+        "Potencia máxima de disipación": 0.1,
         "temperatura de calibracion": 22.2,
         "fecha de calibracion": "19/06/2025"
     },
@@ -95,6 +103,7 @@
         "drift anual": 0.312,
         "alfa": -3e-08,
         "beta": -5.4e-08,
+        "Potencia máxima de disipación": 0.1,
         "temperatura de calibracion": 22.5,
         "fecha de calibracion": "11/06/2025"
     },
@@ -106,6 +115,7 @@
         "drift anual": 1.75,
         "alfa": 6.7e-08,
         "beta": -1.6e-08,
+        "Potencia máxima de disipación": 0.1,
         "temperatura de calibracion": 23.0,
         "fecha de calibracion": "11/06/2025"
     },
@@ -117,6 +127,7 @@
         "drift anual": 0.278,
         "alfa": 4e-08,
         "beta": -2.6e-08,
+        "Potencia máxima de disipación": 0.1,
         "temperatura de calibracion": 23.0,
         "fecha de calibracion": "23/05/2025"
     },
@@ -128,6 +139,7 @@
         "drift anual": 0.619,
         "alfa": 5.5e-08,
         "beta": -2.2e-08,
+        "Potencia máxima de disipación": 0.1,
         "temperatura de calibracion": 21.4,
         "fecha de calibracion": "14/07/2025"
     },
@@ -139,6 +151,7 @@
         "drift anual": 3.309,
         "alfa": -4.1e-08,
         "beta": -3.4e-08,
+        "Potencia máxima de disipación": 0.1,
         "temperatura de calibracion": 23.0,
         "fecha de calibracion": "23/05/2025"
     },
@@ -150,6 +163,7 @@
         "drift anual": 0.157,
         "alfa": -3e-08,
         "beta": -3.6e-08,
+        "Potencia máxima de disipación": 0.1,
         "temperatura de calibracion": 23.0,
         "fecha de calibracion": "10/04/2025"
     },
@@ -161,6 +175,7 @@
         "drift anual": 0.037,
         "alfa": 9.4e-08,
         "beta": 1.2e-08,
+        "Potencia máxima de disipación": 0.1,
         "temperatura de calibracion": 23.0,
         "fecha de calibracion": "10/04/2025"
     },
@@ -172,6 +187,7 @@
         "drift anual": 0.018,
         "alfa": -8e-08,
         "beta": -2.4e-08,
+        "Potencia máxima de disipación": 0.1,
         "temperatura de calibracion": 23.0,
         "fecha de calibracion": "10/04/2025"
     },
@@ -183,6 +199,7 @@
         "drift anual": -0.694,
         "alfa": 1e-06,
         "beta": 0.0,
+        "Potencia máxima de disipación": 0.1,
         "temperatura de calibracion": 22.1,
         "fecha de calibracion": "11/06/2025"
     },
@@ -190,58 +207,72 @@
         "Nombre": "RES_TEST1",
         "serial": "3043",
         "valor": 1,
-        "incertidumbre en ohm": "0.0",
-        "drift anual": 0.0,
+        "incertidumbre_en_ohm": "0.0",
+        "drift_anual": 0.0,
         "alfa": 0.0,
         "beta": 0.0,
-        "temperatura de calibracion": 23.0,
-        "fecha de calibracion": "20/01/1810"
+        "Potencia_maxima_de_disipacion": 0.1,
+        "temperatura_de_calibracion": 23.0,
+        "fecha_de_calibracion": "20/01/1810"
     },
     {
         "Nombre": "RES_TEST2",
         "serial": "8868",
         "valor": 1,
-        "incertidumbre en ohm": 0.0,
-        "drift anual": 0.0,
+        "incertidumbre_en_ohm": 0.0,
+        "drift_anual": 0.0,
         "alfa": 0.0,
         "beta": 0.0,
-        "temperatura de calibracion": 23.0,
-        "fecha de calibracion": "20/01/1810"
+        "Potencia_maxima_de_disipacion": 0.1,
+        "temperatura_de_calibracion": 23.0,
+        "fecha_de_calibracion": "20/01/1810"
+    },
+    {
+        "Nombre": "RES_TEST3",
+        "serial": "Sin S/N",
+        "valor": 0.1,
+        "incertidumbre_en_ohm": 0.0,
+        "drift_anual": 0.0,
+        "alfa": 0.0,
+        "beta": 0.0,
+        "Potencia_maxima_de_disipacion": 0.1,
+        "temperatura_de_calibracion": 0.0,
+        "fecha_de_calibracion": "20/01/1810"
     },
     {
         "Nombre": "LPC-PT100-1",
         "serial": "Sin S/N",
         "valor": 99.85004,
-        "incertidumbre en grados Celsius": 0.07,
-        "incertidumbre en ohm": 0.01,
-        "drift anual": 0.0,
+        "incertidumbre_en_grados_Celsius": 0.07,
+        "incertidumbre_en_ohm": 0.01,
+        "drift_anual": 0.0,
         "alfa": 3.923232e-03,
         "beta": -6.5780944e-07,
-        "temperatura de calibracion": 0.0,
-        "fecha de calibracion": "20/01/2026"
+        "temperatura_de_calibracion": 0.0,
+        "fecha_de_calibracion": "20/01/2026"
     },
     {
         "Nombre": "LPC-PT100-2",
         "serial": "Sin S/N",
         "valor": 99.95343,
-        "incertidumbre en grados Celsius": 0.07,
-        "incertidumbre en ohm": 0.013,
-        "drift anual": 0.0,
+        "incertidumbre_en_grados_Celsius": 0.07,
+        "incertidumbre_en_ohm": 0.013,
+        "drift_anual": 0.0,
         "alfa": 3.9195673e-03,
         "beta": -6.8720298e-07,
-        "temperatura de calibracion": 0.0,
-        "fecha de calibracion": "20/01/2026"
+        "temperatura_de_calibracion": 0.0,
+        "fecha_de_calibracion": "20/01/2026"
     },
     {
         "Nombre": "LPC-PT100-6",
         "serial": "Sin S/N",
         "valor": 100.07862,
-        "incertidumbre en grados Celsius": 0.15,
-        "incertidumbre en ohm": 0.054,
+        "incertidumbre_en_grados_Celsius": 0.15,
+        "incertidumbre_en_ohm": 0.054,
         "drift anual": 0.0,
         "alfa": 3.9224592e-03,
         "beta": -9.6367782e-07,
-        "temperatura de calibracion": 0.0,
+        "temperatura_de_calibracion": 0.0,
         "fecha de calibracion": "20/01/2026"
     }
 ]

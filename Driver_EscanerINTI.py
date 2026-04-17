@@ -81,7 +81,7 @@ def Conectar_Entradas_Salidas(Scanner, ENTRADA_S, ENTRADA_X):
     Scanner.SetearCanal(Scanner.direccion, Scanner.SALIDA_2, ENTRADA_X)
     time.sleep(1)
 
-    return "Análisis_Datos"
+    return "Medición_N"
 
 
 def Abrir_Canales(Scanner):

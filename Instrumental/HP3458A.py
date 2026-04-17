@@ -71,6 +71,15 @@ class HP3458A:
         else:
             raise ValueError(f"Modo de medición '{mode}' no soportado.")
 
+    def configure_resistance_4wire(self, range_val=100, resolution=0.001, nplc=10):
+        """Configura medición de resistencia 4 hilos (FRES)."""
+        self.instrument.write("CONF:FRES")
+        self.instrument.write(f"FRES:RANG {range_val}")
+        self.instrument.write(f"FRES:RES {resolution}")
+        self.instrument.write(f"SENS:FRES:NPLC {nplc}")
+        if self.verbose:
+            print(f"[INFO] Resistencia 4-wire configurada: rango {range_val}, resolución {resolution}, NPLC {nplc}")
+
     def measure_once(self) -> float:
         self.instrument.write("INIT")
         self.instrument.write("*WAI")

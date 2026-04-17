@@ -7,26 +7,26 @@ def Menu_Temp(GPIB_DMM1,GPIB_DMM2, GPIB_DMM3):
     """Menú principal del sistema de medición"""
     while True:
         limpiar_pantalla()
-        print("=" * 60)
-        print("  SISTEMA DE MEDICIÓN Y CALIBRACIÓN - ESCANER INTI-MI6010D")
-        print("=" * 60)
+        print("=" * 90)
+        print("      SISTEMA DE MEDICIÓN Y CALIBRACIÓN - ESCANER INTI-MI6010D")
+        print("=" * 90)
         print("\nConfiguración de sensores y multímetros para medición de temperatura")
         print("1 - Comenzar configuración")
         print("2 - Salir del programa")
-        print("\n" + "-" * 60)
+        print("\n" + "-" * 90)
 
         opcion = input("Seleccione una opción (1-2): ")
 
         if opcion == "1":
             resultado = menu_sensores(GPIB_DMM1, GPIB_DMM2, GPIB_DMM3)
             if resultado:
-                configuracion, GPIB_DMM1, GPIB_DMM2, GPIB_DMM3 = resultado
+                configuracion, GPIB_DMM1, GPIB_DMM2, GPIB_DMM3, cantidad = resultado
                 mostrar_resumen(configuracion)
-                return configuracion, GPIB_DMM1, GPIB_DMM2, GPIB_DMM3
+                return "Medición", GPIB_DMM1, GPIB_DMM2, GPIB_DMM3, cantidad
         elif opcion == "2":
             limpiar_pantalla()
             print("Gracias por usar el sistema. ¡Hasta pronto!")
-            return None, GPIB_DMM1, GPIB_DMM2, GPIB_DMM3
+            return "Inicio", GPIB_DMM1, GPIB_DMM2, GPIB_DMM3, 0
         else:
             print("❌ Opción inválida. Intente de nuevo.")
             input("Presione Enter para continuar...")
@@ -43,15 +43,15 @@ def menu_sensores(GPIB_DMM1,GPIB_DMM2, GPIB_DMM3):
     
     while True:
         limpiar_pantalla()
-        print("=" * 60)
-        print("  SELECCIONAR SENSORES/RESISTORES")
-        print("=" * 60)
+        print("=" * 90)
+        print("      SELECCIONAR SENSORES/RESISTORES")
+        print("=" * 90)
         print("\n¿Cuántos sensores desea utilizar?")
         print("1 - 1 sensor")
         print("2 - 2 sensores")
         print("3 - 3 sensores")
         print("4 - Volver al menú principal")
-        print("\n" + "-" * 60)
+        print("\n" + "-" * 90)
 
         opcion = input("Seleccione una opción (1-4): ")
 
@@ -76,7 +76,7 @@ def menu_sensores(GPIB_DMM1,GPIB_DMM2, GPIB_DMM3):
                 configuracion["multimetros"][sensor] = multimetro
             
             if len(configuracion["sensores"]) == cantidad:
-                return configuracion, GPIB_DMM1, GPIB_DMM2, GPIB_DMM3
+                return configuracion, GPIB_DMM1, GPIB_DMM2, GPIB_DMM3,cantidad
         elif opcion == "4":
             return None
         else:
@@ -98,14 +98,14 @@ def seleccionar_sensor(numero):
     
     while True:
         limpiar_pantalla()
-        print("=" * 60)
-        print(f"  SELECCIONAR SENSOR #{numero}")
-        print("=" * 60)
+        print("=" * 90)
+        print(f"     SELECCIONAR SENSOR #{numero}")
+        print("=" * 90)
         print("\nSensores disponibles:")
         for clave, nombre in sensores_disponibles.items():
             print(f"{clave} - {nombre}")
         print("0 - Volver")
-        print("\n" + "-" * 60)
+        print("\n" + "-" * 90)
 
         opcion = input("Seleccione una opción: ")
 
@@ -133,14 +133,14 @@ def seleccionar_multimetro(sensor, multimetros_seleccionados, GPIB_DMM1, GPIB_DM
     
     while True:
         limpiar_pantalla()
-        print("=" * 60)
-        print(f"  ASIGNAR MULTÍMETRO PARA SENSOR: {sensor}")
-        print("=" * 60)
+        print("=" * 90)
+        print(f"     ASIGNAR MULTÍMETRO PARA SENSOR: {sensor}")
+        print("=" * 90)
         print("\nMultímetros disponibles:")
         for clave, dmm in multimetros_disponibles.items():
             print(f"{clave} - {dmm['nombre']} ({dmm['GPIB Default']})")
         print("0 - Volver")
-        print("\n" + "-" * 60)
+        print("\n" + "-" * 90)
 
         opcion = input("Seleccione una opción: ")
 
@@ -195,9 +195,9 @@ def mostrar_resumen(configuracion):
     """Muestra el resumen de la configuración elegida"""
     while True:
         limpiar_pantalla()
-        print("=" * 60)
-        print("  RESUMEN DE CONFIGURACIÓN")
-        print("=" * 60)
+        print("=" * 90)
+        print("      RESUMEN DE CONFIGURACIÓN")
+        print("=" * 90)
         
         print("\n📊 SENSORES/RESISTORES SELECCIONADOS:")
         for i, sensor in enumerate(configuracion["sensores"], 1):
@@ -222,12 +222,11 @@ def mostrar_resumen(configuracion):
 
         if opcion == "1":
             limpiar_pantalla()
-            print("=" * 60)
+            print("=" * 90)
             print("  ✓ CONFIGURACIÓN GUARDADA")
-            print("=" * 60)
+            print("=" * 90)
             print("\n¡Sistema listo para comenzar mediciones!")
-            print("\nPresione Enter para terminar...")
-            input()
+            print("=" * 90)
             return
         elif opcion == "2":
             return
@@ -236,12 +235,14 @@ def mostrar_resumen(configuracion):
         else:
             print("❌ Opción inválida. Intente de nuevo.")
             input("Presione Enter para continuar...")
+            print("=" * 90)
 
 
-
+"""
 # Ejecutar programa
 if __name__ == "__main__":
     resultado = Menu_Temp(14, 13, 26)
     if resultado:
         configuracion, GP1, GP2, GP3 = resultado
         print(f"\n✅ GPIB Finales: DMM1={GP1}, DMM2={GP2}, DMM3={GP3}")
+"""

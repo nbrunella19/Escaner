@@ -30,7 +30,7 @@ class ScannerInti:
         try:
             self.direccion = self.rm.open_resource(gpib_address)
             self.direccion.timeout = 1000  # Timeout en ms
-            print(f"Escaner conectado a {gpib_address}")
+            print(f"\nEscaner conectado a {gpib_address}")
             self.Configuracion(self.direccion)
         except Exception as e:
             raise RuntimeError(f"No se pudo conectar al instrumento: {e}")

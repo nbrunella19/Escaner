@@ -10,20 +10,22 @@ import matplotlib.pyplot as plt
 import scipy.stats as stats
 from scipy.stats import linregress
 from pathlib import Path
-from datetime import datetime
+import datetime
 
 
 #####################################################################################################################
 def Welcome_Menu():
     limpiar_pantalla()
     limpiar_teclado()
-    print("=" * 60)
-    print("#   Sistema de medición y calibración de resistores de precisión ScannerINTI-MI6010D v1.0 ")    
-    print("#   Autor: NSB")   
-    print("#   Año  : 2026")      
-    print("=" * 60)
+    print("=" * 90)
+    print("#   Sistema de medición y calibración de resistores de precisión ScannerINTI-MI6010D v1.0 ")  
+    print("#   Departamento de Metrología Cuántica - INTI")     
+    print("#   Autor: Sr. Nicolás S. Brunella")   
+    print("#   Última corrección : Abril 2026")      
+    print("=" * 90)
     while True:
         opcion = input("\nPresionar 1 para iniciar medición o 2 para cerrar: ")
+        print("=" * 90)
         limpiar_pantalla() 
         if opcion == "1":
             Estado = "Lectura_Parametros"
@@ -62,30 +64,7 @@ def limpiar_teclado():
         termios.tcflush(sys.stdin, termios.TCIFLUSH)
     except:
         pass  # en Windows no existe termios
-#####################################################################################################################
 
-def Menu_Inicial():
-    
-    print("--- Modo de aplicación ---\n") 
-    print("1. Medir y calibrar")
-    print("2. Calcular desde una medición ya existente")
-    while True:
-            
-            opcion = input("Introducir modo (1 o 2):")
-            if opcion ==   '1' :
-                break
-                 
-            elif opcion == '2':
-                break
-            
-            else:
-                limpiar_pantalla()
-                print("--- Modo de aplicación ---\n") 
-                print("1. Medir y calibrar")
-                print("2. Calcular desde una medición ya existente")
-                      
-    return opcion   
-#####################################################################################################################
 
 def Ruta_de_analisis_existente():
     # --- pedir y validar ruta del generador ---
@@ -126,30 +105,6 @@ def Ruta_de_analisis_existente():
     return (str(ruta_generador), str(ruta_curva_carga),str(ruta_curva_config),
             nombre_archivo_generador, nombre_archivo_curva, nombre_archivo_config)
 
-#####################################################################################################################
-def extraccion_datos(ruta_json):
-    """
-    Lee un archivo JSON y devuelve los valores:
-    Vn_Cx, Vn_Rp, Vn_Tau, Frec, Sweep_time
-    """
-    ruta = Path(ruta_json)
-    if not ruta.exists():
-        raise FileNotFoundError(f"No se encontró el archivo: {ruta_json}")
-    
-    with open(ruta, "r") as file:
-        datos = json.load(file)
-    
-    try:
-        Modo   = datos["Modo"]
-        Vn_Cx  = datos["Vn_Cx"]
-        Vn_Rp  = datos["Vn_Rp"]
-        Vn_Tau = datos["Vn_Tau"]
-        Frec   = datos["Frec"]
-        Sweep_time = datos["Sweep_time"]
-    except KeyError as e:
-        raise KeyError(f"Falta el campo {e} en el archivo JSON: {ruta_json}")
-    
-    return Modo,Vn_Cx, Vn_Rp, Vn_Tau, Frec, Sweep_time
 
 #####################################################################################################################
 
@@ -181,32 +136,6 @@ def Creacion_Directorio_Salida(RS, RX, IX, TIME_REVERSAL, NUM_MEASUREMENTS, NUM_
     print(f"Archivo de medición guardado en: {Ruta_medicion_resistencia}")
     print(f"Archivo de configuración guardado en: {Ruta_medicion_temperatura}")
 
-#####################################################################################################################
-def Menu_Config():   
-    
-    print("\n---- Menú de Configuración ----\n")  
-      
-    while True:
-        Vn_capacitor   = input("Valor nominal del capacitor de transferencia (Cx) en microfarad: ")
-        if Vn_capacitor.isdigit():
-            Vn_capacitor_int = int(Vn_capacitor) 
-            break
-        else:
-            print("Eso no es un número válido.")   
-     
-    while True:
-        Vn_resistencia = input("Valor nominal del resistor patrón (Rp) en ohm: ")
-        if Vn_resistencia .isdigit():
-            Vn_resistencia_int = int(Vn_resistencia) 
-            break
-        else:
-            print("Eso no es un número válido.")   
-    
-    tau_x_ciclo = 5
-
-    return Vn_capacitor_int, Vn_resistencia_int, tau_x_ciclo
-
-
 def Mostrar_Configuracion(Rx, Rs, Ix, Is, T_inv, Cant_Med, Cant_Stat):
     
     Is= Ix * Rs / Rx  # Corriente en Rs usando divisor de corriente
@@ -221,23 +150,6 @@ def Mostrar_Configuracion(Rx, Rs, Ix, Is, T_inv, Cant_Med, Cant_Stat):
     return 
 
 ###################################################################################################################
-
-def Menu_Final():
-    """ Menú final después de la calibración """
-    limpiar_pantalla()
-    print("La calibración ha finalizado.")
-    while True: 
-            select_final = input("\nPresionar 1 para volver al menú principal o 2 para cerrar: ")  
-            limpiar_pantalla() 
-            if select_final == "1":
-                return "INICIO"
-            elif select_final == "2":
-                sys.exit()   
-            else:
-                limpiar_pantalla()
-                print("Elección incorrecta.")
-
-
 
 def Save_Data(Name_M,Path_Output, Rs, Rx, Ix, T_Invertion, Num_Med, Num_Stat,
               Mea_Res=None, Mea_Temp1=None, Mea_Temp2=None):
@@ -396,41 +308,58 @@ def Config_Rx():
             
         return Rx
 
-def Lectura_Parametros():    
+def Lectura_Parametros():
     
-    print("\n---- Lectura de parámetros ----\n")  
+    print("=" * 90)
+    print("\n       Lectura de parámetros       \n")  
+    print("=" * 90)
+
+    # -------------------------------
+    # RUTA DE ENTRADA (CSV)
+    # -------------------------------
     while True:
-                
-            Ruta_entrada = input("Ingrese la ruta completa del archivo de parámetros (CSV): ")
-            Ruta = Path(Ruta_entrada)
-    
-            if not Ruta.exists():
-        
-                opcion = input("Ruta mal escrita o archivo no encontrado.\nPresionar 2 para salir o cualquier otra tecla para intentar de nuevo: ")
-                if opcion == "2":
-                    sys.exit()  
-            else:
+        print("Ingrese la ruta del archivo CSV con los parámetros de medición:\n")
+        Ruta_entrada = input().strip()
+        ruta_csv = Path(Ruta_entrada)
+
+        if not ruta_csv.exists():
+            print("❌ El archivo no existe. Intente nuevamente.\n")
+            continue
+
+        if not ruta_csv.is_file():
+            print("❌ La ruta no corresponde a un archivo.\n")
+            continue
+
+        break
+
+    # Leer CSV
+    df = pd.read_csv(ruta_csv)
+    Cantidad_filas = len(df)
+
+    # -------------------------------
+    # RUTA DE SALIDA (DIRECTORIO)
+    # -------------------------------
+    while True:
+        print("\nIngrese la carpeta donde quiere guardar la medición:\n")
+        Ruta_salida = input().strip()
+        ruta_salida = Path(Ruta_salida)
+
+        if ruta_salida.exists():
+            if ruta_salida.is_dir():
                 break
-    
-    with open(Ruta, "r") as file:    
-        # Leer el archivo CSV y almacenar los datos en una lista de listas
-        datos = csv.reader(file)
-        
-        listado_listas = []
-        # Convertir cada fila del CSV en una lista y agregarla a la lista principal
-        for fila in datos:
-            listado_listas.append(fila)
-        
-        # Crear DataFrame
-        columnas = ['ID_Rs', 'ID_Rx', 'Ix [mA]', 'Tiempo_Inversion [s]', 'VN_Rs [ohm]', 'Cant_Mediciones', 'Cant_Estadistica', 'Ch_Rs', 'Ch_Rx', 'Bit_Control']        
-        # Ordenamiento de información en DataFrame para facilitar su procesamiento.
-        df = pd.DataFrame(listado_listas, columns=columnas)
-        
-        # Variable global para cantidad de Mediciones
-        Cantidad_filas = len(df)
+            else:
+                print("❌ La ruta existe pero no es una carpeta.\n")
+                continue
+        else:
+            try:
+                ruta_salida.mkdir(parents=True, exist_ok=True)
+                print("📁 Carpeta creada correctamente.\n")
+                break
+            except Exception as e:
+                print(f"❌ No se pudo crear la carpeta: {e}\n")
+                continue
 
-
-    return "Medición",df,Cantidad_filas
+    return "Seleccion_Instrumentos", df, Cantidad_filas, ruta_salida
 
 
 def Cargar_Resistor_Calibrado(RS_NOMBRE):
@@ -453,7 +382,7 @@ def Cargar_Resistor_Calibrado(RS_NOMBRE):
         # Buscar el resistor por nombre
         for resistor in datos:
             if resistor.get("Nombre") == RS_NOMBRE:
-                print(f"\n✓ Resistor '{RS_NOMBRE}' encontrado en base de datos")
+                print(f"\nResistor '{RS_NOMBRE}' encontrado en base de datos")
                 return resistor
         
         print(f"\n✗ Resistor '{RS_NOMBRE}' NO encontrado en base de datos")
@@ -466,3 +395,69 @@ def Cargar_Resistor_Calibrado(RS_NOMBRE):
         print(f"Error: {e}")
         return None
 
+
+def limpiar_nombre(nombre):
+    return nombre.replace(" ", "_").replace("/", "-")
+
+
+def Guarda_Medicion(RS_NOMBRE, RX_NOMBRE, Ix,
+                   Medicion_Ratio, Desvio_Ratio,
+                   Medicion_dmm1, Desvio_dmm1,
+                   Medicion_dmm2, Desvio_dmm2,
+                   Medicion_dmm3, Desvio_dmm3,
+                   Ruta_Salida):
+
+    # Sanitizar nombres
+    rs = limpiar_nombre(RS_NOMBRE)
+    rx = limpiar_nombre(RX_NOMBRE)
+
+    ahora = datetime.datetime.now()
+    fecha_str = ahora.strftime('%Y-%m-%d')
+
+    # Nombre de archivo con formato pedido
+    nombre_archivo = f"{rs}_vs_{rx}_a_{Ix}mA-{fecha_str}.csv"
+    #ruta_salida = Path(__file__).parent / nombre_archivo
+
+    ruta_salida = Ruta_Salida / nombre_archivo
+    
+    # Verificar si ya existe
+    archivo_existe = ruta_salida.exists()
+
+    with open(ruta_salida, "a", newline="") as csvfile:
+        fieldnames = [
+            "timestamp",
+            "Medicion_Ratio", "Desvio_Ratio",
+            "Medicion_dmm1", "Desvio_dmm1",
+            "Medicion_dmm2", "Desvio_dmm2",
+            "Medicion_dmm3", "Desvio_dmm3"
+        ]
+
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+        # Escribir encabezado solo si es nuevo
+        if not archivo_existe:
+            writer.writeheader()
+
+        # Timestamp con hora:minuto:segundo
+        timestamp = ahora.strftime("%H:%M:%S")
+
+        for ratio, desvio_ratio, dmm1, desvio_dmm1, dmm2, desvio_dmm2, dmm3, desvio_dmm3 in zip(
+            Medicion_Ratio, Desvio_Ratio,
+            Medicion_dmm1, Desvio_dmm1,
+            Medicion_dmm2, Desvio_dmm2,
+            Medicion_dmm3, Desvio_dmm3
+        ):
+            writer.writerow({
+                "timestamp": timestamp,
+                "Medicion_Ratio": ratio,
+                "Desvio_Ratio": desvio_ratio,
+                "Medicion_dmm1": dmm1,
+                "Desvio_dmm1": desvio_dmm1,
+                "Medicion_dmm2": dmm2,
+                "Desvio_dmm2": desvio_dmm2,
+                "Medicion_dmm3": dmm3,
+                "Desvio_dmm3": desvio_dmm3
+            })
+
+    print(f"Resultados guardados en: {ruta_salida}\n")
+    print("=" * 90) 
