@@ -3,6 +3,7 @@ Test script corregido para MI6010D
 Lectura correcta usando Serial Poll (SRQ handling)
 """
 
+import datetime
 import sys
 import time
 #import Manejo_Archivos.Func_Data
@@ -107,7 +108,11 @@ def Measure_with_Temp(GPIB_ADDRESS_BRID, RS, TIME_REVERSAL, IX, NUM_MEASUREMENTS
     DMM_INTERVAL = 5.0
     next_dmm_time = time.time()
     
-    measurements = []
+    Measurements  = []
+    Hora_Medicion = []
+    Hora_Medicion_DMM1 = []
+    Hora_Medicion_DMM2 = []
+    Hora_Medicion_DMM3 = []
 
     try:
         if bridge_connected:
@@ -125,7 +130,7 @@ def Measure_with_Temp(GPIB_ADDRESS_BRID, RS, TIME_REVERSAL, IX, NUM_MEASUREMENTS
 
         while time.time() < timeout_limit:
 
-            if bridge_connected and len(measurements) >= NUM_MEASUREMENTS:
+            if bridge_connected and len(Measurements) >= NUM_MEASUREMENTS:
                 break
 
             # -----------------------------
@@ -149,9 +154,16 @@ def Measure_with_Temp(GPIB_ADDRESS_BRID, RS, TIME_REVERSAL, IX, NUM_MEASUREMENTS
 
                     if data.startswith("&"):
                         try:
+                            # Lee el valor de la relación Rx/Rs, (según manual enviado luego del símbolo "&")
                             value = float(data[1:])
-                            measurements.append(value)
+                            Measurements.append(value)
+                            
+                            # Registra la hora de medición
+                            Momento_Actual = datetime.datetime.now()
+                            Hora_Medicion.append(Momento_Actual.strftime("%H:%M:%S"))
+                            
                             print(f"→ Rx/Rs puente: {value}")
+                        
                         except ValueError:
                             print("Error parseando valor")
 
@@ -171,6 +183,8 @@ def Measure_with_Temp(GPIB_ADDRESS_BRID, RS, TIME_REVERSAL, IX, NUM_MEASUREMENTS
                     try:
                         r1 = dmm1.read()
                         r1_values.append(r1)
+                        Momento_Actual = datetime.datetime.now()
+                        Hora_Medicion_DMM1.append(Momento_Actual.strftime("%H:%M:%S"))
                         print(f"{DMM_1}: {r1:.5f} Ω")
                     except Exception as e:
                         print("Error leyendo DMM1:", e)
@@ -179,6 +193,8 @@ def Measure_with_Temp(GPIB_ADDRESS_BRID, RS, TIME_REVERSAL, IX, NUM_MEASUREMENTS
                     try:
                         r2 = dmm2.read()
                         r2_values.append(r2)
+                        Momento_Actual = datetime.datetime.now()
+                        Hora_Medicion_DMM2.append(Momento_Actual.strftime("%H:%M:%S"))
                         print(f"{DMM_2}: {r2:.5f} Ω")
                     except Exception as e:
                         print("Error leyendo DMM2:", e)
@@ -187,6 +203,8 @@ def Measure_with_Temp(GPIB_ADDRESS_BRID, RS, TIME_REVERSAL, IX, NUM_MEASUREMENTS
                     try:
                         r3 = dmm3.read()
                         r3_values.append(r3)
+                        Momento_Actual = datetime.datetime.now()
+                        Hora_Medicion_DMM3.append(Momento_Actual.strftime("%H:%M:%S"))
                         print(f"{DMM_3}: {r3:.5f} Ω")
                     except Exception as e:
                         print("Error leyendo DMM3:", e)
@@ -198,8 +216,8 @@ def Measure_with_Temp(GPIB_ADDRESS_BRID, RS, TIME_REVERSAL, IX, NUM_MEASUREMENTS
         # -----------------------------
         # RESULTADOS
         # -----------------------------
-        ratio_promedio = sum(measurements)/len(measurements) if measurements else None
-        ratio_desvio = np.std(measurements) if measurements else None
+        ratio_promedio = sum(Measurements)/len(Measurements) if Measurements else None
+        ratio_desvio = np.std(Measurements) if Measurements else None
         
         r1_promedio = sum(r1_values)/len(r1_values) if r1_values else None
         r1_desvio = np.std(r1_values) if r1_values else None
@@ -210,7 +228,7 @@ def Measure_with_Temp(GPIB_ADDRESS_BRID, RS, TIME_REVERSAL, IX, NUM_MEASUREMENTS
         r3_promedio = sum(r3_values)/len(r3_values) if r3_values else None
         r3_desvio = np.std(r3_values) if r3_values else None
 
-        if measurements:
+        if Measurements:
             print(f"\nRx/Rs promedio: {ratio_promedio}, desvío: {ratio_desvio}")
         if r1_values:
             print(f"DMM1 promedio: {r1_promedio}, desvío: {r1_desvio}")
@@ -232,32 +250,37 @@ def Measure_with_Temp(GPIB_ADDRESS_BRID, RS, TIME_REVERSAL, IX, NUM_MEASUREMENTS
         if dmm3_connected:
             dmm3.close()
 
-    return ratio_promedio, ratio_desvio, r1_promedio, r1_desvio, r2_promedio, r2_desvio, r3_promedio, r3_desvio
+    return Hora_Medicion, Measurements, Hora_Medicion_DMM1, r1_values, Hora_Medicion_DMM2, r2_values, Hora_Medicion_DMM3, r3_values
 
 
-def Check_de_Seguridad(Rs, Rx, Ix,Psmax):
+def Check_de_Seguridad(Rs, Rx, Ix_mA,Psmax):
     """
     Función que verifica que las condiciones de seguridad  
     para la medición se cumplan antes de iniciar el proceso.
      - Rs: Resistencia del resistor patrón (Ohmios)
      - Rx: Resistencia del resistor a medir (Ohmios)
-     - Ix: Corriente aplicada al resistor (mA)
+     - Ix_mA: Corriente aplicada al resistor (mA)
      - Psmax: Potencia máxima de disipación del resistor patrón (W)
-    """   
-    Is= Rx*Ix*1e-3/Rs
+    """
+    Ix= Ix_mA * 1e-3  # Convertir mA a A   
+    Is= Rx*Ix/Rs
     Ps= Rs*Is**2
     
     print(f"  Corriente Is: {Is:.6f} mA")
     print(f"  Potencia  Rs: {Ps:.6f} mW")
     if Rs <= 0 or Rx <= 0:
-        print("Error: Rs y Rx deben ser mayores que 0.")
+        print("Error: Rs y Rx deben ser mayores que 0.\n")
+        print("Condición de seguridad no cumplida. Saltando medición.")
         return False
     if Ps > Psmax:
-        print("Error: La potencia de salida excede el límite permitido.")
+        print("Error: La potencia de salida excede el límite permitido.\n")
+        print("Condición de seguridad no cumplida. Saltando medición.")
         return False
     if Ix <= 0:
-        print("Error: Ix debe ser mayor que 0.")
+        print("Error: Ix debe ser mayor que 0.\n")
+        print("Condición de seguridad no cumplida. Saltando medición.")
         return False
+    
     return True
 
 '''

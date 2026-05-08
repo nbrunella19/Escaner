@@ -4,7 +4,9 @@ def limpiar_pantalla():
 
 
 def Menu_Temp(GPIB_DMM1,GPIB_DMM2, GPIB_DMM3):
+    
     """Menú principal del sistema de medición"""
+    
     while True:
         limpiar_pantalla()
         print("=" * 90)
@@ -18,15 +20,19 @@ def Menu_Temp(GPIB_DMM1,GPIB_DMM2, GPIB_DMM3):
         opcion = input("Seleccione una opción (1-2): ")
 
         if opcion == "1":
+            
             resultado = menu_sensores(GPIB_DMM1, GPIB_DMM2, GPIB_DMM3)
+            
             if resultado:
                 configuracion, GPIB_DMM1, GPIB_DMM2, GPIB_DMM3, cantidad = resultado
                 mostrar_resumen(configuracion)
-                return "Medición", GPIB_DMM1, GPIB_DMM2, GPIB_DMM3, cantidad
+                return "Medición", GPIB_DMM1, GPIB_DMM2, GPIB_DMM3, cantidad, configuracion
+        
         elif opcion == "2":
+            
             limpiar_pantalla()
             print("Gracias por usar el sistema. ¡Hasta pronto!")
-            return "Inicio", GPIB_DMM1, GPIB_DMM2, GPIB_DMM3, 0
+            return "Inicio", GPIB_DMM1, GPIB_DMM2, GPIB_DMM3, 0, None
         else:
             print("❌ Opción inválida. Intente de nuevo.")
             input("Presione Enter para continuar...")

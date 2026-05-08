@@ -1,2 +1,6 @@
-Rs_Nombre,Rx_Nombre,Ix,t_inv,Rs_Nominal,Cant_Med,Cant_Med_Est,CH_Rs,CH_Rx,Bit_Control
-RES_TEST3,RES_TEST1,1,6,0.1,35,25,8,2,1
+Rs_Nombre,Rx_Nombre,Ix,t_inv,Rs_Nominal,Rx_Nominal,Cant_Med,Cant_Med_Est,CH_Rs,CH_Rx,Delay
+RES_TEST1,RES_TEST2,1,6,1,1,3,3,2,3,2
+
+
+
+

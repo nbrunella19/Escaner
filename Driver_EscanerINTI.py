@@ -57,19 +57,19 @@ def Conectar_Entrada_Salida(Scanner, SALIDA, ENTRADA):
 def Conectar_Entradas_Salidas(Scanner, ENTRADA_S, ENTRADA_X):
     """
     Conecta ENTRADA_S a SALIDA 'S' y ENTRADA_X a SALIDA 'X'.
-    Retorna 'Medición' si es válido. De lo contrario retorna 'Abrir_Canales'.
+    Retorna True si es válido. De lo contrario retorna False.
     """
     if not isinstance(ENTRADA_S, int) or not (1 <= ENTRADA_S <= 10):
         print("Error: ENTRADA_S debe ser entero entre 1 y 10.")
-        return "Abrir_Canales"
+        return False
 
     if not isinstance(ENTRADA_X, int) or not (1 <= ENTRADA_X <= 10):
         print("Error: ENTRADA_X debe ser entero entre 1 y 10.")
-        return "Abrir_Canales"
+        return False
 
     if ENTRADA_S == ENTRADA_X:
         print("Error: No se pueden usar la misma entrada para S y X.")
-        return "Abrir_Canales"
+        return False
 
     print(f"Conectando canal {ENTRADA_S} a salida S...")
     # Salida S es "SALIDA_1"
@@ -81,12 +81,12 @@ def Conectar_Entradas_Salidas(Scanner, ENTRADA_S, ENTRADA_X):
     Scanner.SetearCanal(Scanner.direccion, Scanner.SALIDA_2, ENTRADA_X)
     time.sleep(1)
 
-    return "Medición_N"
+    return True
 
 
 def Abrir_Canales(Scanner):
     Scanner.ResetGeneral(Scanner.direccion)
-    time.sleep(3)
+    time.sleep(6)
     print("Salidas abiertas.")
     
 def Cerrar_Escaner(Scanner):
